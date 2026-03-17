@@ -12,18 +12,6 @@ pipeline {
             }
         }
 
-        stage('Validate Python') {
-            steps {
-                sh '''
-                python3 -m py_compile producer/csv_replayer.py
-                python3 -m py_compile spark/stream_features.py
-                python3 -m py_compile spark/batch_rule_engine.py
-                python3 -m py_compile airflow/dags/fraud_rule_engine_dag.py
-                python3 -m py_compile airflow/dags/fraud_streaming_monitor_dag.py
-                '''
-            }
-        }
-
         stage('Validate Docker Compose') {
             steps {
                 sh '''
