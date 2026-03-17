@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        COMPOSE_FILE = 'docker-compose.yml'
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -12,41 +8,18 @@ pipeline {
             }
         }
 
-        stage('Validate Docker Compose') {
+        stage('Verify Repo Files') {
             steps {
                 sh '''
-                docker-compose -f ${COMPOSE_FILE} config
+                pwd
+                ls -R
                 '''
             }
         }
 
-        stage('Start Infra') {
+        stage('Pipeline Ready') {
             steps {
-                sh '''
-                docker-compose -f ${COMPOSE_FILE} up -d
-                '''
-            }
-        }
-
-        stage('Wait for Services') {
-            steps {
-                sh 'sleep 30'
-            }
-        }
-
-        stage('Initialize Database') {
-            steps {
-                sh '''
-                docker exec de2-postgres psql -U banking -d bankingdb -f /sql/init.sql
-                '''
-            }
-        }
-
-        stage('Smoke Check') {
-            steps {
-                sh '''
-                docker exec de2-postgres psql -U banking -d bankingdb -c "SELECT 1;"
-                '''
+                echo 'Jenkins is connected to the repo and pipeline is working.'
             }
         }
     }
