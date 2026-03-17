@@ -15,7 +15,7 @@ pipeline {
         stage('Validate Docker Compose') {
             steps {
                 sh '''
-                docker compose -f ${COMPOSE_FILE} config
+                docker-compose -f ${COMPOSE_FILE} config
                 '''
             }
         }
@@ -23,7 +23,7 @@ pipeline {
         stage('Start Infra') {
             steps {
                 sh '''
-                docker compose -f ${COMPOSE_FILE} up -d
+                docker-compose -f ${COMPOSE_FILE} up -d
                 '''
             }
         }
