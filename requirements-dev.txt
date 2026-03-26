@@ -1,1 +1,5 @@
 pytest
+pandas
+kafka-python
+pyspark
+psycopg2-binary
