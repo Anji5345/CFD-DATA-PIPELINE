@@ -10,6 +10,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout Code') {
             steps {
                 checkout scm
@@ -18,26 +19,26 @@ pipeline {
 
         stage('Verify Project Structure') {
             steps {
-                bat '''
-                if not exist producer\\csv_replayer.py exit /b 1
-                if not exist spark\\stream_features.py exit /b 1
-                if not exist spark\\batch_rule_engine.py exit /b 1
-                if not exist spark\\rule_utils.py exit /b 1
-                if not exist sql\\init.sql exit /b 1
-                if not exist sql\\generate_alerts.sql exit /b 1
-                if not exist requirements-dev.txt exit /b 1
-                if not exist tests\\test_producer.py exit /b 1
-                if not exist tests\\test_rule_utils.py exit /b 1
+                sh '''
+                test -f producer/csv_replayer.py
+                test -f spark/stream_features.py
+                test -f spark/batch_rule_engine.py
+                test -f spark/rule_utils.py
+                test -f sql/init.sql
+                test -f sql/generate_alerts.sql
+                test -f requirements-dev.txt
+                test -f tests/test_producer.py
+                test -f tests/test_rule_utils.py
                 '''
             }
         }
 
         stage('Create Virtual Environment') {
             steps {
-                bat '''
-                python -m venv venv
-                call venv\\Scripts\\activate
-                python -m pip install --upgrade pip
+                sh '''
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install --upgrade pip
                 pip install -r requirements-dev.txt
                 '''
             }
@@ -45,8 +46,8 @@ pipeline {
 
         stage('Run Unit Tests') {
             steps {
-                bat '''
-                call venv\\Scripts\\activate
+                sh '''
+                . venv/bin/activate
                 pytest tests --junitxml=pytest-results.xml
                 '''
             }
@@ -54,19 +55,19 @@ pipeline {
 
         stage('Validate Python Syntax') {
             steps {
-                bat '''
-                call venv\\Scripts\\activate
-                python -m py_compile producer\\csv_replayer.py
-                python -m py_compile spark\\stream_features.py
-                python -m py_compile spark\\batch_rule_engine.py
-                python -m py_compile spark\\rule_utils.py
+                sh '''
+                . venv/bin/activate
+                python -m py_compile producer/csv_replayer.py
+                python -m py_compile spark/stream_features.py
+                python -m py_compile spark/batch_rule_engine.py
+                python -m py_compile spark/rule_utils.py
                 '''
             }
         }
 
         stage('Validate Docker Compose') {
             steps {
-                bat '''
+                sh '''
                 docker compose config
                 '''
             }
@@ -81,7 +82,7 @@ pipeline {
             echo 'Jenkins pipeline completed successfully.'
         }
         failure {
-            echo 'Jenkins pipeline failed. Check the logs.'
+            echo 'Jenkins pipeline failed. Check logs.'
         }
     }
 }
