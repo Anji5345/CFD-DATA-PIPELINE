@@ -68,7 +68,7 @@ pipeline {
         stage('Validate Docker Compose') {
             steps {
                 sh '''
-                docker compose config
+                docker-compose config
                 '''
             }
         }
